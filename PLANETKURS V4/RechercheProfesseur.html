@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #000000 0%, #DD0000 50%, #FFD700 100%);
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    .header {
+      background: linear-gradient(to right, #000000, #DD0000, #FFD700);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .search-box select,
+    .search-box input {
+      padding: 10px;
+      border: 2px solid #DD0000;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    .search-box select {
+      flex: 0 0 150px;
+    }
+    
+    .search-box input {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .search-box button {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #DD0000, #000000);
+      color: #FFD700;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .search-box button:hover {
+      background: linear-gradient(135deg, #000000, #DD0000);
+    }
+    
+    .results {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .prof-card {
+      background: #f9f9f9;
+      border-left: 5px solid #FFD700;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .prof-card:hover {
+      border-left-color: #DD0000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    
+    .prof-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #FFD700;
+    }
+    
+    .prof-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #000000;
+    }
+    
+    .prof-id {
+      background: linear-gradient(135deg, #FFD700, #FFC700);
+      color: #000000;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .prof-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    
+    .info-item {
+      font-size: 14px;
+    }
+    
+    .info-label {
+      font-weight: bold;
+      color: #DD0000;
+    }
+    
+    .prof-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .btn-edit {
+      background: #FFD700;
+      color: #000000;
+    }
+    
+    .btn-edit:hover {
+      background: #FFC700;
+    }
+    
+    .btn-delete {
+      background: #DD0000;
+      color: white;
+    }
+    
+    .btn-delete:hover {
+      background: #BB0000;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 5px;
+      background: #000000;
+      color: #FFD700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>👨‍🏫 RECHERCHER PROFESSEUR - PLANETKURS</h2>
+    </div>
+    
+    <div class="search-box">
+      <select id="searchCriteria">
+        <option value="id">ID Professeur</option>
+        <option value="nom">Nom</option>
+        <option value="prenom">Prénom</option>
+        <option value="niveau">Niveau</option>
+      </select>
+      
+      <input type="text" id="searchValue" placeholder="Entrez votre recherche...">
+      
+      <button onclick="rechercher()">🔍 RECHERCHER</button>
+    </div>
+    
+    <div id="results" class="results"></div>
+  </div>
+  
+  <script>
+    function rechercher() {
+      var critere = document.getElementById('searchCriteria').value;
+      var valeur = document.getElementById('searchValue').value.trim();
+      
+      if (!valeur) {
+        alert('Veuillez entrer un critère de recherche');
+        return;
+      }
+      
+      document.getElementById('results').innerHTML = '<div class="no-results">⏳ Recherche en cours...</div>';
+      
+      google.script.run
+        .withSuccessHandler(afficherResultats)
+        .withFailureHandler(function(error) {
+          document.getElementById('results').innerHTML = 
+            '<div class="no-results">❌ Erreur: ' + error.message + '</div>';
+        })
+        .rechercherProfesseur(critere, valeur);
+    }
+    
+    function afficherResultats(resultats) {
+      var resultsDiv = document.getElementById('results');
+      
+      if (resultats.length === 0) {
+        resultsDiv.innerHTML = '<div class="no-results">😕 Aucun professeur trouvé</div>';
+        return;
+      }
+      
+      var html = '';
+      resultats.forEach(function(prof) {
+        html += `
+          <div class="prof-card">
+            <div class="prof-header">
+              <div class="prof-name">👤 ${prof.nom} ${prof.prenom}</div>
+              <div class="prof-id">${prof.id}</div>
+            </div>
+            
+            <div class="prof-info">
+              <div class="info-item">
+                <span class="info-label">📚 Niveau:</span> ${prof.niveau}
+              </div>
+              <div class="info-item">
+                <span class="info-label">📞 Téléphone:</span> ${prof.telephone}
+              </div>
+              <div class="info-item">
+                <span class="info-label">📍 Adresse:</span> ${prof.adresse}
+              </div>
+              <div class="info-item">
+                <span class="info-label">📧 Email:</span> ${prof.email || 'N/A'}
+              </div>
+              <div class="info-item">
+                <span class="info-label">📅 Embauché le:</span> ${formatDate(prof.dateEmbauche)}
+              </div>
+            </div>
+            
+            <div>
+              <span class="badge">${prof.niveau}</span>
+            </div>
+            
+            <div class="prof-actions">
+              <button class="btn btn-edit" onclick="modifierProfesseur(${prof.ligne})">
+                ✏️ MODIFIER
+              </button>
+              <button class="btn btn-delete" onclick="supprimerProfesseur(${prof.ligne}, '${prof.nom} ${prof.prenom}')">
+                🗑️ SUPPRIMER
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      resultsDiv.innerHTML = html;
+    }
+    
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      var date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR');
+    }
+    
+    function modifierProfesseur(ligne) {
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            afficherFormulaireModification(result.professeur);
+          } else {
+            alert('Erreur: ' + result.message);
+          }
+        })
+        .chargerProfesseur(ligne);
+    }
+
+    function afficherFormulaireModification(prof) {
+      document.querySelector('.container').innerHTML = `
+        <div class="header">
+          <h2>✏️ MODIFIER PROFESSEUR - PLANETKURS</h2>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <form id="modifForm">
+          <input type="hidden" id="ligne" value="${prof.ligne}">
+
+          <div class="form-group">
+            <label>ID Professeur</label>
+            <input type="text" value="${prof.id}" readonly style="background: #f0f0f0;">
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label for="nom">Nom <span class="required">*</span></label>
+              <input type="text" id="nom" value="${prof.nom}" required>
+            </div>
+
+            <div class="form-group">
+              <label for="prenom">Prénom <span class="required">*</span></label>
+              <input type="text" id="prenom" value="${prof.prenom}" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="niveau">Niveau Enseigné <span class="required">*</span></label>
+            <select id="niveau" required>
+              <option value="A1" ${prof.niveau === 'A1' ? 'selected' : ''}>A1</option>
+              <option value="A2" ${prof.niveau === 'A2' ? 'selected' : ''}>A2</option>
+              <option value="B1" ${prof.niveau === 'B1' ? 'selected' : ''}>B1</option>
+              <option value="B2" ${prof.niveau === 'B2' ? 'selected' : ''}>B2</option>
+              <option value="Tous niveaux" ${prof.niveau === 'Tous niveaux' ? 'selected' : ''}>Tous niveaux</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="adresse">Adresse <span class="required">*</span></label>
+            <input type="text" id="adresse" value="${prof.adresse}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="telephone">Téléphone <span class="required">*</span></label>
+            <input type="tel" id="telephone" value="${prof.telephone}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" value="${prof.email || ''}">
+          </div>
+
+          <div class="btn-group">
+            <button type="submit" class="btn btn-edit">💾 ENREGISTRER</button>
+            <button type="button" class="btn btn-delete" onclick="google.script.host.close()">✗ ANNULER</button>
+          </div>
+        </form>
+
+        <style>
+          .message { padding: 12px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-weight: bold; display: none; }
+          .message.success { background: #4CAF50; color: white; }
+          .message.error { background: #DD0000; color: white; }
+          .form-group { margin-bottom: 15px; }
+          label { display: block; margin-bottom: 5px; color: #000000; font-weight: bold; font-size: 14px; }
+          input[type="text"], input[type="tel"], input[type="email"], select {
+            width: 100%; padding: 10px; border: 2px solid #DD0000; border-radius: 5px; font-size: 14px;
+          }
+          input:focus, select:focus { outline: none; border-color: #FFD700; }
+          .required { color: #DD0000; }
+          .row { display: flex; gap: 15px; }
+          .row .form-group { flex: 1; }
+          .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+          .btn-group button { flex: 1; padding: 12px; font-size: 16px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        </style>
+      `;
+
+      document.getElementById('modifForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var data = {
+          modifier: true,
+          ligneModifier: parseInt(document.getElementById('ligne').value),
+          idProf: prof.id,
+          nom: document.getElementById('nom').value,
+          prenom: document.getElementById('prenom').value,
+          niveau: document.getElementById('niveau').value,
+          adresse: document.getElementById('adresse').value,
+          telephone: document.getElementById('telephone').value,
+          email: document.getElementById('email').value
+        };
+
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              alert('✅ ' + result.message);
+              google.script.host.close();
+            } else {
+              alert('❌ ' + result.message);
+            }
+          })
+          .enregistrerProfesseur(data);
+      });
+    }
+    
+    function supprimerProfesseur(ligne, nomComplet) {
+      if (confirm('Voulez-vous vraiment supprimer le professeur ' + nomComplet + ' ?\n\nCette action est irréversible!')) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            alert(result.message);
+            if (result.success) {
+              rechercher(); // Rafraîchir les résultats
+            }
+          })
+          .supprimerProfesseur(ligne);
+      }
+    }
+    
+    // Permettre la recherche avec la touche Entrée
+    document.getElementById('searchValue').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        rechercher();
+      }
+    });
+  </script>
+</body>
+</html>

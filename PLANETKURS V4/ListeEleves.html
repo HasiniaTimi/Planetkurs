@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #000000 0%, #DD0000 50%, #FFD700 100%);
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    .header {
+      background: linear-gradient(to right, #000000, #DD0000, #FFD700);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .stat-card {
+      flex: 1;
+      min-width: 150px;
+      background: linear-gradient(135deg, #FFD700, #FFC700);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #000000;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #333;
+      margin-top: 5px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th {
+      background: #000000;
+      color: #FFD700;
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+    }
+    
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    tr:nth-child(even) {
+      background: #FFF8DC;
+    }
+    
+    tr:hover {
+      background: #FFE4B5;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .badge-A1 { background: #000000; color: #FFD700; }
+    .badge-A2 { background: #DD0000; color: white; }
+    .badge-B1 { background: #FFD700; color: #000000; }
+    .badge-B2 { background: #FF6B35; color: white; }
+    
+    .badge-actif { background: #4CAF50; color: white; }
+    .badge-inactif { background: #999; color: white; }
+    
+    .table-container {
+      max-height: 450px;
+      overflow-y: auto;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .btn-export {
+      background: linear-gradient(135deg, #DD0000, #000000);
+      color: #FFD700;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    
+    .btn-export:hover {
+      background: linear-gradient(135deg, #000000, #DD0000);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>📋 LISTE COMPLÈTE DES ÉLÈVES</h2>
+    </div>
+    
+    <div class="stats" id="stats">
+      <div class="stat-card">
+        <div class="stat-number" id="totalEleves">-</div>
+        <div class="stat-label">Total Élèves</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="niveauA1">-</div>
+        <div class="stat-label">Niveau A1</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="niveauA2">-</div>
+        <div class="stat-label">Niveau A2</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="niveauB1">-</div>
+        <div class="stat-label">Niveau B1</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="niveauB2">-</div>
+        <div class="stat-label">Niveau B2</div>
+      </div>
+    </div>
+    
+    <div class="table-container">
+      <table id="tableEleves">
+        <thead>
+          <tr>
+            <th>Matricule</th>
+            <th>Nom Complet</th>
+            <th>Téléphone</th>
+            <th>Email</th>
+            <th>Niveau</th>
+            <th>Professeur</th>
+            <th>Statut</th>
+            <th>Date Inscription</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr>
+            <td colspan="8" class="loading">⏳ Chargement des données...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <script>
+    window.onload = function() {
+      google.script.run
+        .withSuccessHandler(afficherEleves)
+        .withFailureHandler(function(error) {
+          document.getElementById('tbody').innerHTML = 
+            '<tr><td colspan="8" class="loading">❌ Erreur: ' + error.message + '</td></tr>';
+        })
+        .obtenirTousLesEleves();
+    };
+    
+    function afficherEleves(eleves) {
+      if (eleves.length === 0) {
+        document.getElementById('tbody').innerHTML = 
+          '<tr><td colspan="8" class="loading">Aucun élève enregistré</td></tr>';
+        return;
+      }
+      
+      // Calculer les statistiques
+      var stats = {
+        total: eleves.length,
+        A1: 0, A2: 0, B1: 0, B2: 0
+      };
+      
+      var html = '';
+      eleves.forEach(function(eleve) {
+        // Compter par niveau
+        if (eleve.niveau === 'A1') stats.A1++;
+        else if (eleve.niveau === 'A2') stats.A2++;
+        else if (eleve.niveau === 'B1') stats.B1++;
+        else if (eleve.niveau === 'B2') stats.B2++;
+        
+        var dateInscription = eleve.dateInscription ? new Date(eleve.dateInscription).toLocaleDateString('fr-FR') : 'N/A';
+        
+        html += `
+          <tr>
+            <td><strong>${eleve.matricule}</strong></td>
+            <td>${eleve.nom} ${eleve.prenom}</td>
+            <td>${eleve.telephone}</td>
+            <td>${eleve.email || '-'}</td>
+            <td><span class="badge badge-${eleve.niveau}">${eleve.niveau}</span></td>
+            <td>${eleve.professeur || '-'}</td>
+            <td><span class="badge badge-${eleve.statut.toLowerCase()}">${eleve.statut}</span></td>
+            <td>${dateInscription}</td>
+          </tr>
+        `;
+      });
+      
+      document.getElementById('tbody').innerHTML = html;
+      
+      // Afficher les stats
+      document.getElementById('totalEleves').textContent = stats.total;
+      document.getElementById('niveauA1').textContent = stats.A1;
+      document.getElementById('niveauA2').textContent = stats.A2;
+      document.getElementById('niveauB1').textContent = stats.B1;
+      document.getElementById('niveauB2').textContent = stats.B2;
+    }
+  </script>
+</body>
+</html>

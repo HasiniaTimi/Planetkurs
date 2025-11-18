@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #000000 0%, #DD0000 50%, #FFD700 100%);
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    .header {
+      background: linear-gradient(to right, #000000, #DD0000, #FFD700);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 3px solid #DD0000;
+    }
+    
+    .tab {
+      padding: 12px 24px;
+      background: #f0f0f0;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px 8px 0 0;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      background: linear-gradient(135deg, #DD0000, #000000);
+      color: #FFD700;
+    }
+    
+    .tab:hover:not(.active) {
+      background: #e0e0e0;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .filter-section {
+      background: #FFF8DC;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .filter-section label {
+      font-weight: bold;
+      color: #000000;
+    }
+    
+    .filter-section select {
+      padding: 8px;
+      border: 2px solid #DD0000;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    .filter-section button {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #DD0000, #000000);
+      color: #FFD700;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .filter-section button:hover {
+      background: linear-gradient(135deg, #000000, #DD0000);
+    }
+    
+    .summary {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .summary-card {
+      flex: 1;
+      min-width: 150px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .summary-card.paye {
+      background: #C8E6C9;
+      border-left: 5px solid #4CAF50;
+    }
+    
+    .summary-card.non-paye {
+      background: #FFCDD2;
+      border-left: 5px solid #F44336;
+    }
+    
+    .summary-card.total {
+      background: #E3F2FD;
+      border-left: 5px solid #2196F3;
+    }
+    
+    .summary-number {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .summary-label {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #666;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    th {
+      background: #000000;
+      color: #FFD700;
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+    }
+    
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    tr.paye {
+      background: #E8F5E9;
+    }
+    
+    tr.non-paye {
+      background: #FFEBEE;
+    }
+    
+    tr:hover {
+      opacity: 0.8;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .badge-paye {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .badge-non-paye {
+      background: #F44336;
+      color: white;
+    }
+    
+    .table-container {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .montant {
+      font-weight: bold;
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>💳 SUIVI DES PAIEMENTS - PLANETKURS</h2>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="changerTab('eleves')">💰 Écolage Élèves</button>
+      <button class="tab" onclick="changerTab('professeurs')">👨‍🏫 Salaires Professeurs</button>
+      <button class="tab" onclick="changerTab('toutes')">📊 Toutes Transactions</button>
+    </div>
+    
+    <!-- TAB ÉLÈVES -->
+    <div id="tab-eleves" class="tab-content active">
+      <div class="filter-section">
+        <label for="moisEleves">Mois:</label>
+        <select id="moisEleves">
+          <option value="Janvier">Janvier</option>
+          <option value="Février">Février</option>
+          <option value="Mars">Mars</option>
+          <option value="Avril">Avril</option>
+          <option value="Mai">Mai</option>
+          <option value="Juin">Juin</option>
+          <option value="Juillet">Juillet</option>
+          <option value="Août">Août</option>
+          <option value="Septembre">Septembre</option>
+          <option value="Octobre">Octobre</option>
+          <option value="Novembre">Novembre</option>
+          <option value="Décembre">Décembre</option>
+        </select>
+        
+        <label for="anneeEleves">Année:</label>
+        <select id="anneeEleves">
+          <option value="2024">2024</option>
+          <option value="2025" selected>2025</option>
+          <option value="2026">2026</option>
+        </select>
+        
+        <button onclick="verifierPaiementsEleves()">🔍 VÉRIFIER</button>
+      </div>
+      
+      <div class="summary" id="summaryEleves"></div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Matricule</th>
+              <th>Nom Élève</th>
+              <th>Niveau</th>
+              <th>Mois</th>
+              <th>Statut</th>
+              <th>Montant</th>
+              <th>Date Paiement</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEleves">
+            <tr>
+              <td colspan="7" class="loading">⏹️ Sélectionnez un mois et cliquez sur "VÉRIFIER"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- TAB PROFESSEURS -->
+    <div id="tab-professeurs" class="tab-content">
+      <div class="filter-section">
+        <label for="moisProfs">Mois:</label>
+        <select id="moisProfs">
+          <option value="0">Janvier</option>
+          <option value="1">Février</option>
+          <option value="2">Mars</option>
+          <option value="3">Avril</option>
+          <option value="4">Mai</option>
+          <option value="5">Juin</option>
+          <option value="6">Juillet</option>
+          <option value="7">Août</option>
+          <option value="8">Septembre</option>
+          <option value="9">Octobre</option>
+          <option value="10">Novembre</option>
+          <option value="11">Décembre</option>
+        </select>
+        
+        <label for="anneeProfs">Année:</label>
+        <select id="anneeProfs">
+          <option value="2024">2024</option>
+          <option value="2025" selected>2025</option>
+          <option value="2026">2026</option>
+        </select>
+        
+        <button onclick="verifierPaiementsProfesseurs()">🔍 VÉRIFIER</button>
+      </div>
+      
+      <div class="summary" id="summaryProfs"></div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom Professeur</th>
+              <th>Niveau Enseigné</th>
+              <th>Statut</th>
+              <th>Montant</th>
+              <th>Date Paiement</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyProfs">
+            <tr>
+              <td colspan="6" class="loading">⏹️ Sélectionnez un mois et cliquez sur "VÉRIFIER"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- TAB TOUTES TRANSACTIONS -->
+    <div id="tab-toutes" class="tab-content">
+      <div class="filter-section">
+        <label for="typeToutes">Type:</label>
+        <select id="typeToutes">
+          <option value="">Tous</option>
+          <option value="Entrée">Entrées</option>
+          <option value="Sortie">Sorties</option>
+        </select>
+        
+        <label for="categorieToutes">Catégorie:</label>
+        <select id="categorieToutes">
+          <option value="">Toutes</option>
+          <option value="Écolage">Écolage</option>
+          <option value="Inscription">Inscription</option>
+          <option value="Réinscription">Réinscription</option>
+          <option value="Don">Don</option>
+          <option value="Traduction">Traduction</option>
+          <option value="Salaire Professeur">Salaire Professeur</option>
+          <option value="Loyer">Loyer</option>
+          <option value="Électricité">Électricité</option>
+          <option value="Internet">Internet</option>
+          <option value="Fournitures">Fournitures</option>
+          <option value="Publicité">Publicité</option>
+          <option value="Maintenance">Maintenance</option>
+        </select>
+        
+        <label for="moisToutes">Mois:</label>
+        <select id="moisToutes">
+          <option value="">Tous</option>
+          <option value="0">Janvier</option>
+          <option value="1">Février</option>
+          <option value="2">Mars</option>
+          <option value="3">Avril</option>
+          <option value="4">Mai</option>
+          <option value="5">Juin</option>
+          <option value="6">Juillet</option>
+          <option value="7">Août</option>
+          <option value="8">Septembre</option>
+          <option value="9">Octobre</option>
+          <option value="10">Novembre</option>
+          <option value="11">Décembre</option>
+        </select>
+        
+        <label for="anneeToutes">Année:</label>
+        <select id="anneeToutes">
+          <option value="2024">2024</option>
+          <option value="2025" selected>2025</option>
+          <option value="2026">2026</option>
+        </select>
+        
+        <button onclick="chargerToutesTransactions()">🔍 AFFICHER</button>
+      </div>
+      
+      <div class="summary" id="summaryToutes"></div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Référence</th>
+              <th>Type</th>
+              <th>Catégorie</th>
+              <th>Description</th>
+              <th>Montant</th>
+              <th>Solde</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyToutes">
+            <tr>
+              <td colspan="7" class="loading">⏹️ Sélectionnez vos filtres et cliquez sur "AFFICHER"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Définir le mois actuel par défaut
+    window.onload = function() {
+      var moisActuel = new Date().getMonth();
+      var moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+      document.getElementById('moisEleves').value = moisNoms[moisActuel];
+      document.getElementById('moisProfs').value = moisActuel;
+    };
+    
+    function changerTab(tab) {
+      // Désactiver tous les tabs
+      document.querySelectorAll('.tab').forEach(function(t) {
+        t.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(function(c) {
+        c.classList.remove('active');
+      });
+      
+      // Activer le tab sélectionné
+      if (tab === 'eleves') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('tab-eleves').classList.add('active');
+      } else if (tab === 'professeurs') {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('tab-professeurs').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab')[2].classList.add('active');
+        document.getElementById('tab-toutes').classList.add('active');
+      }
+    }
+    
+    function chargerToutesTransactions() {
+      var type = document.getElementById('typeToutes').value;
+      var categorie = document.getElementById('categorieToutes').value;
+      var mois = document.getElementById('moisToutes').value;
+      var annee = parseInt(document.getElementById('anneeToutes').value);
+      
+      document.getElementById('tbodyToutes').innerHTML = 
+        '<tr><td colspan="7" class="loading">⏳ Chargement en cours...</td></tr>';
+      
+      google.script.run
+        .withSuccessHandler(afficherToutesTransactions)
+        .withFailureHandler(function(error) {
+          document.getElementById('tbodyToutes').innerHTML = 
+            '<tr><td colspan="7" class="loading">❌ Erreur: ' + error.message + '</td></tr>';
+        })
+        .obtenirToutesTransactions(type, categorie, mois !== '' ? parseInt(mois) : null, annee);
+    }
+    
+    function afficherToutesTransactions(resultats) {
+      if (resultats.length === 0) {
+        document.getElementById('tbodyToutes').innerHTML = 
+          '<tr><td colspan="7" class="loading">Aucune transaction trouvée</td></tr>';
+        return;
+      }
+      
+      var totalEntrees = 0;
+      var totalSorties = 0;
+      
+      resultats.forEach(function(t) {
+        if (t.type === 'Entrée') {
+          totalEntrees += t.montant;
+        } else {
+          totalSorties += Math.abs(t.montant);
+        }
+      });
+      
+      // Afficher le résumé
+      document.getElementById('summaryToutes').innerHTML = `
+        <div class="summary-card total">
+          <div class="summary-number">${resultats.length}</div>
+          <div class="summary-label">Total Transactions</div>
+        </div>
+        <div class="summary-card paye">
+          <div class="summary-number">${formatMontant(totalEntrees)} Ar</div>
+          <div class="summary-label">Total Entrées</div>
+        </div>
+        <div class="summary-card non-paye">
+          <div class="summary-number">${formatMontant(totalSorties)} Ar</div>
+          <div class="summary-label">Total Sorties</div>
+        </div>
+        <div class="summary-card total">
+          <div class="summary-number">${formatMontant(totalEntrees - totalSorties)} Ar</div>
+          <div class="summary-label">Solde Net</div>
+        </div>
+      `;
+      
+      // Afficher le tableau
+      var html = '';
+      resultats.forEach(function(t) {
+        var classe = t.type === 'Entrée' ? 'paye' : 'non-paye';
+        var date = new Date(t.date).toLocaleDateString('fr-FR');
+        
+        html += `
+          <tr class="${classe}">
+            <td>${date}</td>
+            <td><strong>${t.reference}</strong></td>
+            <td>${t.type}</td>
+            <td>${t.categorie}</td>
+            <td>${t.description}</td>
+            <td class="montant">${formatMontant(Math.abs(t.montant))} Ar</td>
+            <td><strong>${formatMontant(t.solde)} Ar</strong></td>
+          </tr>
+        `;
+      });
+      
+      document.getElementById('tbodyToutes').innerHTML = html;
+    }
+    
+    function verifierPaiementsEleves() {
+      var mois = document.getElementById('moisEleves').value;
+      var annee = parseInt(document.getElementById('anneeEleves').value);
+      
+      document.getElementById('tbodyEleves').innerHTML = 
+        '<tr><td colspan="7" class="loading">⏳ Vérification en cours...</td></tr>';
+      
+      google.script.run
+        .withSuccessHandler(afficherResultatsEleves)
+        .withFailureHandler(function(error) {
+          document.getElementById('tbodyEleves').innerHTML = 
+            '<tr><td colspan="7" class="loading">❌ Erreur: ' + error.message + '</td></tr>';
+        })
+        .verifierPaiementsEleves(mois, annee);
+    }
+    
+    function afficherResultatsEleves(resultats) {
+      if (resultats.length === 0) {
+        document.getElementById('tbodyEleves').innerHTML = 
+          '<tr><td colspan="7" class="loading">Aucun élève actif trouvé</td></tr>';
+        return;
+      }
+      
+      var payes = resultats.filter(function(r) { return r.paye; }).length;
+      var nonPayes = resultats.length - payes;
+      var totalMontant = resultats.reduce(function(sum, r) { return sum + (r.montant || 0); }, 0);
+      
+      // Afficher le résumé
+      document.getElementById('summaryEleves').innerHTML = `
+        <div class="summary-card total">
+          <div class="summary-number">${resultats.length}</div>
+          <div class="summary-label">Total Élèves</div>
+        </div>
+        <div class="summary-card paye">
+          <div class="summary-number">${payes}</div>
+          <div class="summary-label">Ont Payé</div>
+        </div>
+        <div class="summary-card non-paye">
+          <div class="summary-number">${nonPayes}</div>
+          <div class="summary-label">N'ont pas Payé</div>
+        </div>
+        <div class="summary-card total">
+          <div class="summary-number">${formatMontant(totalMontant)} Ar</div>
+          <div class="summary-label">Total Reçu</div>
+        </div>
+      `;
+      
+      // Afficher le tableau
+      var html = '';
+      resultats.forEach(function(r) {
+        var classe = r.paye ? 'paye' : 'non-paye';
+        var badge = r.paye ? 'badge-paye' : 'badge-non-paye';
+        var statut = r.paye ? '✓ PAYÉ' : '✗ NON PAYÉ';
+        var montant = r.paye ? formatMontant(r.montant) + ' Ar' : '-';
+        var datePaiement = r.paye && r.datePaiement ? new Date(r.datePaiement).toLocaleDateString('fr-FR') : '-';
+        
+        html += `
+          <tr class="${classe}">
+            <td><strong>${r.matricule}</strong></td>
+            <td>${r.nom}</td>
+            <td>${r.niveau}</td>
+            <td>${r.mois}</td>
+            <td><span class="badge ${badge}">${statut}</span></td>
+            <td class="montant">${montant}</td>
+            <td>${datePaiement}</td>
+          </tr>
+        `;
+      });
+      
+      document.getElementById('tbodyEleves').innerHTML = html;
+    }
+    
+    function verifierPaiementsProfesseurs() {
+      var mois = parseInt(document.getElementById('moisProfs').value);
+      var annee = parseInt(document.getElementById('anneeProfs').value);
+      
+      document.getElementById('tbodyProfs').innerHTML = 
+        '<tr><td colspan="6" class="loading">⏳ Vérification en cours...</td></tr>';
+      
+      google.script.run
+        .withSuccessHandler(afficherResultatsProfs)
+        .withFailureHandler(function(error) {
+          document.getElementById('tbodyProfs').innerHTML = 
+            '<tr><td colspan="6" class="loading">❌ Erreur: ' + error.message + '</td></tr>';
+        })
+        .verifierPaiementsProfesseurs(mois, annee);
+    }
+    
+    function afficherResultatsProfs(resultats) {
+      if (resultats.length === 0) {
+        document.getElementById('tbodyProfs').innerHTML = 
+          '<tr><td colspan="6" class="loading">Aucun professeur trouvé</td></tr>';
+        return;
+      }
+      
+      var payes = resultats.filter(function(r) { return r.paye; }).length;
+      var nonPayes = resultats.length - payes;
+      var totalMontant = resultats.reduce(function(sum, r) { return sum + (r.montant || 0); }, 0);
+      
+      // Afficher le résumé
+      document.getElementById('summaryProfs').innerHTML = `
+        <div class="summary-card total">
+          <div class="summary-number">${resultats.length}</div>
+          <div class="summary-label">Total Professeurs</div>
+        </div>
+        <div class="summary-card paye">
+          <div class="summary-number">${payes}</div>
+          <div class="summary-label">Salaires Payés</div>
+        </div>
+        <div class="summary-card non-paye">
+          <div class="summary-number">${nonPayes}</div>
+          <div class="summary-label">Salaires Non Payés</div>
+        </div>
+        <div class="summary-card total">
+          <div class="summary-number">${formatMontant(totalMontant)} Ar</div>
+          <div class="summary-label">Total Versé</div>
+        </div>
+      `;
+      
+      // Afficher le tableau
+      var html = '';
+      resultats.forEach(function(r) {
+        var classe = r.paye ? 'paye' : 'non-paye';
+        var badge = r.paye ? 'badge-paye' : 'badge-non-paye';
+        var statut = r.paye ? '✓ PAYÉ' : '✗ NON PAYÉ';
+        var montant = r.paye ? formatMontant(r.montant) + ' Ar' : '-';
+        var datePaiement = r.paye && r.datePaiement ? new Date(r.datePaiement).toLocaleDateString('fr-FR') : '-';
+        
+        html += `
+          <tr class="${classe}">
+            <td><strong>${r.id}</strong></td>
+            <td>${r.nom}</td>
+            <td>${r.niveau}</td>
+            <td><span class="badge ${badge}">${statut}</span></td>
+            <td class="montant">${montant}</td>
+            <td>${datePaiement}</td>
+          </tr>
+        `;
+      });
+      
+      document.getElementById('tbodyProfs').innerHTML = html;
+    }
+    
+    function formatMontant(montant) {
+      return Number(montant).toLocaleString('fr-FR');
+    }
+  </script>
+</body>
+</html>

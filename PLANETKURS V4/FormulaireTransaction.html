@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #000000 0%, #DD0000 50%, #FFD700 100%);
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      background: linear-gradient(to right, #000000, #DD0000, #FFD700);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .header h2 {
+      margin: 0;
+      font-size: 24px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #000000;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #DD0000;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #FFD700;
+      box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    
+    .required {
+      color: #DD0000;
+    }
+    
+    .type-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .type-option {
+      flex: 1;
+      padding: 15px;
+      border: 3px solid #ddd;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+    
+    .type-option.entree {
+      border-color: #4CAF50;
+    }
+    
+    .type-option.entree.active {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .type-option.sortie {
+      border-color: #DD0000;
+    }
+    
+    .type-option.sortie.active {
+      background: #DD0000;
+      color: white;
+    }
+    
+    .type-option:hover {
+      transform: scale(1.05);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #DD0000, #000000);
+      color: #FFD700;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #000000, #DD0000);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .btn-secondary {
+      background: #FFD700;
+      color: #000000;
+      border: 2px solid #000000;
+    }
+    
+    .btn-secondary:hover {
+      background: #FFC700;
+      transform: translateY(-2px);
+    }
+    
+    .message {
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: bold;
+      display: none;
+    }
+    
+    .message.success {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .message.error {
+      background: #DD0000;
+      color: white;
+    }
+    
+    .montant-input {
+      position: relative;
+    }
+    
+    .montant-input input {
+      padding-right: 60px;
+    }
+    
+    .currency {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: bold;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .info-box {
+      background: #FFF8DC;
+      border-left: 4px solid #FFD700;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>💰 NOUVELLE TRANSACTION - PLANETKURS</h2>
+    </div>
+    
+    <div id="message" class="message"></div>
+    
+    <form id="transactionForm">
+      <div class="info-box">
+        💡 <strong>Types de transactions:</strong><br>
+        • <strong>Entrée:</strong> Écolage, paiements élèves<br>
+        • <strong>Sortie:</strong> Salaires, loyer, logistique
+      </div>
+      
+      <div class="type-selector">
+        <div class="type-option entree" onclick="selectType('Entrée')">
+          ⬇️ ENTRÉE<br>
+          <small>Argent reçu</small>
+        </div>
+        <div class="type-option sortie" onclick="selectType('Sortie')">
+          ⬆️ SORTIE<br>
+          <small>Argent dépensé</small>
+        </div>
+      </div>
+      
+      <input type="hidden" id="type" name="type" value="">
+      
+      <div class="form-group">
+        <label for="categorie">Catégorie <span class="required">*</span></label>
+        <select id="categorie" name="categorie" required>
+          <option value="">-- Sélectionner --</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="eleveGroup" style="display:none;">
+        <label for="nomEleve">Nom de l'Élève</label>
+        <select id="nomEleve" name="nomEleve">
+          <option value="">-- Sélectionner --</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="professeurGroup" style="display:none;">
+        <label for="nomProfesseur">Nom du Professeur</label>
+        <select id="nomProfesseur" name="nomProfesseur">
+          <option value="">-- Sélectionner --</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="moisGroup" style="display:none;">
+        <label for="moisAPayer">Mois à Payer</label>
+        <select id="moisAPayer" name="moisAPayer">
+          <option value="">-- Sélectionner --</option>
+          <option value="Janvier">Janvier</option>
+          <option value="Février">Février</option>
+          <option value="Mars">Mars</option>
+          <option value="Avril">Avril</option>
+          <option value="Mai">Mai</option>
+          <option value="Juin">Juin</option>
+          <option value="Juillet">Juillet</option>
+          <option value="Août">Août</option>
+          <option value="Septembre">Septembre</option>
+          <option value="Octobre">Octobre</option>
+          <option value="Novembre">Novembre</option>
+          <option value="Décembre">Décembre</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="montant">Montant <span class="required">*</span></label>
+        <div class="montant-input">
+          <input type="number" id="montant" name="montant" required 
+                 min="0" step="100" placeholder="0">
+          <span class="currency">Ar</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Description <span class="required">*</span></label>
+        <textarea id="description" name="description" required 
+                  placeholder="Détails de la transaction..."></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="reference">Référence / N° Reçu</label>
+        <input type="text" id="reference" name="reference" 
+               placeholder="Laissez vide pour génération automatique">
+        <div style="background:#E8F5E9;padding:8px;border-radius:5px;font-size:12px;margin-top:5px;">
+          💡 Si vide, une référence sera générée automatiquement<br>
+          <strong>Format :</strong> REC-202511-0001 (Entrée) ou PAY-202511-0001 (Sortie)
+        </div>
+      </div>
+      
+      <div class="btn-group">
+        <button type="submit" class="btn-primary">✓ ENREGISTRER</button>
+        <button type="button" class="btn-secondary" onclick="google.script.host.close()">
+          ✗ ANNULER
+        </button>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+    var typeSelectionne = '';
+    
+    var categoriesEntree = [
+      'Écolage',
+      'Inscription',
+      'Réinscription',
+      'Don',
+      'Traduction',
+      'Autre entrée'
+    ];
+    
+    var categoriesSortie = [
+      'Salaire Professeur',
+      'Loyer',
+      'Électricité',
+      'Eau',
+      'Internet',
+      'Fournitures',
+      'Matériel',
+      'Transport',
+      'Maintenance',
+      'Marketing',
+      'Autre sortie'
+    ];
+    
+    // Charger la liste des élèves au chargement
+    window.onload = function() {
+      google.script.run
+        .withSuccessHandler(function(eleves) {
+          var select = document.getElementById('nomEleve');
+          eleves.forEach(function(eleve) {
+            var option = document.createElement('option');
+            option.value = eleve.nom;
+            option.textContent = eleve.nom;
+            select.appendChild(option);
+          });
+        })
+        .obtenirListeEleves();
+    };
+    
+    function selectType(type) {
+      typeSelectionne = type;
+      document.getElementById('type').value = type;
+      
+      // Mettre à jour l'interface
+      document.querySelectorAll('.type-option').forEach(function(el) {
+        el.classList.remove('active');
+      });
+      
+      if (type === 'Entrée') {
+        document.querySelector('.type-option.entree').classList.add('active');
+        remplirCategories(categoriesEntree);
+        // Afficher les champs pour les entrées
+        document.getElementById('eleveGroup').style.display = 'block';
+        document.getElementById('moisGroup').style.display = 'block';
+        document.getElementById('professeurGroup').style.display = 'none';
+      } else {
+        document.querySelector('.type-option.sortie').classList.add('active');
+        remplirCategories(categoriesSortie);
+        // Masquer les champs pour les sorties (sauf professeur pour salaire)
+        document.getElementById('eleveGroup').style.display = 'none';
+        document.getElementById('moisGroup').style.display = 'none';
+        document.getElementById('professeurGroup').style.display = 'none';
+      }
+    }
+    
+    function changerCategorie() {
+      var categorie = document.getElementById('categorie').value;
+      
+      // Afficher le champ professeur si catégorie = Salaire Professeur
+      if (categorie === 'Salaire Professeur') {
+        document.getElementById('professeurGroup').style.display = 'block';
+        chargerProfesseurs();
+      } else {
+        document.getElementById('professeurGroup').style.display = 'none';
+      }
+    }
+    
+    function remplirCategories(categories) {
+      var select = document.getElementById('categorie');
+      select.innerHTML = '<option value="">-- Sélectionner --</option>';
+      
+      categories.forEach(function(cat) {
+        var option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        select.appendChild(option);
+      });
+      
+      // Ajouter l'événement pour détecter le changement de catégorie
+      select.onchange = changerCategorie;
+    }
+    
+    function chargerProfesseurs() {
+      google.script.run
+        .withSuccessHandler(function(professeurs) {
+          var select = document.getElementById('nomProfesseur');
+          select.innerHTML = '<option value="">-- Sélectionner --</option>';
+          
+          professeurs.forEach(function(prof) {
+            var option = document.createElement('option');
+            option.value = prof;
+            option.textContent = prof;
+            select.appendChild(option);
+          });
+        })
+        .obtenirListeProfesseurs();
+    }
+    
+    // Gestion de la soumission du formulaire
+    document.getElementById('transactionForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!typeSelectionne) {
+        alert('⚠️ Veuillez sélectionner le type de transaction (Entrée ou Sortie)');
+        return;
+      }
+      
+      var data = {
+        type: typeSelectionne,
+        categorie: document.getElementById('categorie').value,
+        nomEleve: document.getElementById('nomEleve').value,
+        nomProfesseur: document.getElementById('nomProfesseur').value,
+        moisAPayer: document.getElementById('moisAPayer').value,
+        montant: document.getElementById('montant').value,
+        description: document.getElementById('description').value,
+        reference: document.getElementById('reference').value
+      };
+      
+      // Désactiver le bouton pendant l'envoi
+      var btn = document.querySelector('.btn-primary');
+      btn.disabled = true;
+      btn.textContent = '⏳ ENREGISTREMENT...';
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          var messageDiv = document.getElementById('message');
+          messageDiv.className = 'message ' + (result.success ? 'success' : 'error');
+          
+          if (result.success) {
+            // Afficher le message de succès avec la référence - NE PAS FERMER
+            messageDiv.innerHTML = '✓ Transaction enregistrée avec succès!<br>' +
+                                  '📋 Référence: <strong>' + result.reference + '</strong><br>' +
+                                  '💰 Solde actuel: <strong>' + formatMontant(result.solde) + ' Ar</strong>';
+            messageDiv.style.display = 'block';
+            
+            // Afficher le bouton d'impression du reçu
+            afficherBoutonRecu(result);
+            
+            // NE PAS réinitialiser ni fermer - laisser l'utilisateur voir le message
+          } else {
+            messageDiv.textContent = '❌ ' + result.message;
+            messageDiv.style.display = 'block';
+          }
+          
+          btn.disabled = false;
+          btn.textContent = '✓ ENREGISTRER';
+        })
+        .withFailureHandler(function(error) {
+          var messageDiv = document.getElementById('message');
+          messageDiv.className = 'message error';
+          messageDiv.textContent = 'Erreur: ' + error.message;
+          messageDiv.style.display = 'block';
+          
+          btn.disabled = false;
+          btn.textContent = '✓ ENREGISTRER';
+        })
+        .enregistrerTransaction(data);
+    });
+    
+    function afficherBoutonRecu(result) {
+      // Créer un conteneur pour le bouton si n'existe pas
+      var container = document.getElementById('recuContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'recuContainer';
+        container.style.textAlign = 'center';
+        container.style.marginTop = '15px';
+        document.querySelector('.container').insertBefore(container, document.getElementById('message').nextSibling);
+      }
+      
+      container.innerHTML = `
+        <button onclick="imprimerRecu()" style="
+          padding: 12px 30px;
+          background: linear-gradient(135deg, #FFD700, #FFC700);
+          color: #000000;
+          border: 2px solid #000000;
+          border-radius: 5px;
+          font-size: 16px;
+          font-weight: bold;
+          cursor: pointer;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        ">
+          🖨️ IMPRIMER LE REÇU
+        </button>
+      `;
+      
+      // Stocker les données du reçu
+      window.dernierRecu = result;
+    }
+    
+    function imprimerRecu() {
+      if (!window.dernierRecu) {
+        alert('Aucune transaction à imprimer');
+        return;
+      }
+      
+      var result = window.dernierRecu;
+      var montantAbs = Math.abs(result.montant);
+      
+      // Créer une nouvelle fenêtre pour l'impression
+      var printWindow = window.open('', '_blank');
+      
+      var html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Reçu - ${result.reference}</title>
+  <style>
+    @page { margin: 2cm; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 4px solid #000000;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      background: linear-gradient(to right, #000000, #DD0000, #FFD700);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 32px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .header p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .recu-type {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: ${result.type === 'Entrée' ? '#4CAF50' : '#DD0000'};
+      margin: 20px 0;
+      text-transform: uppercase;
+    }
+    .reference {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      background: #FFD700;
+      color: #000000;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .details {
+      margin: 30px 0;
+    }
+    .detail-row {
+      display: flex;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    .detail-row:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .detail-label {
+      font-weight: bold;
+      width: 200px;
+      color: #333;
+    }
+    .detail-value {
+      flex: 1;
+      color: #000;
+    }
+    .montant-box {
+      background: ${result.type === 'Entrée' ? '#E8F5E9' : '#FFEBEE'};
+      border: 3px solid ${result.type === 'Entrée' ? '#4CAF50' : '#DD0000'};
+      padding: 20px;
+      text-align: center;
+      margin: 30px 0;
+      border-radius: 10px;
+    }
+    .montant-box .label {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .montant-box .montant {
+      font-size: 36px;
+      font-weight: bold;
+      color: ${result.type === 'Entrée' ? '#4CAF50' : '#DD0000'};
+    }
+    .footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 2px solid #ddd;
+    }
+    .signature {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 60px;
+    }
+    .signature div {
+      text-align: center;
+      width: 45%;
+    }
+    .signature-line {
+      border-top: 2px solid #000;
+      margin-top: 50px;
+      padding-top: 10px;
+    }
+    .note {
+      font-style: italic;
+      color: #666;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 30px;
+    }
+    @media print {
+      body { padding: 0; }
+      button { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🇩🇪 PLANETKURS</h1>
+    <p>École de Langue Allemande</p>
+    <p>📍 Antananarivo, Madagascar</p>
+    <p>☎️ +261 34 XX XXX XX | ✉️ contact@planetkurs.mg</p>
+  </div>
+  
+  <div class="recu-type">
+    ${result.type === 'Entrée' ? '📥 REÇU DE PAIEMENT' : '📤 BON DE SORTIE'}
+  </div>
+  
+  <div class="reference">
+    Référence N° ${result.reference}
+  </div>
+  
+  <div class="details">
+    <div class="detail-row">
+      <div class="detail-label">Date :</div>
+      <div class="detail-value">${new Date(result.date).toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</div>
+    </div>
+    
+    <div class="detail-row">
+      <div class="detail-label">Type :</div>
+      <div class="detail-value">${result.type}</div>
+    </div>
+    
+    <div class="detail-row">
+      <div class="detail-label">Catégorie :</div>
+      <div class="detail-value">${result.categorie}</div>
+    </div>
+    
+    ${result.nomEleve ? `
+    <div class="detail-row">
+      <div class="detail-label">Élève :</div>
+      <div class="detail-value">${result.nomEleve}</div>
+    </div>
+    ` : ''}
+    
+    ${result.moisAPayer ? `
+    <div class="detail-row">
+      <div class="detail-label">Mois concerné :</div>
+      <div class="detail-value">${result.moisAPayer}</div>
+    </div>
+    ` : ''}
+    
+    <div class="detail-row">
+      <div class="detail-label">Description :</div>
+      <div class="detail-value">${result.description}</div>
+    </div>
+  </div>
+  
+  <div class="montant-box">
+    <div class="label">MONTANT</div>
+    <div class="montant">${formatMontant(montantAbs)} Ar</div>
+    <div style="margin-top: 10px; font-size: 14px;">
+      (${nombreEnLettres(montantAbs)} Ariary)
+    </div>
+  </div>
+  
+  <div class="footer">
+    <div class="signature">
+      <div>
+        <div style="font-weight: bold;">Le ${result.type === 'Entrée' ? 'payeur' : 'bénéficiaire'}</div>
+        <div class="signature-line">Signature</div>
+      </div>
+      <div>
+        <div style="font-weight: bold;">Pour PlanetKurs</div>
+        <div class="signature-line">Signature et Cachet</div>
+      </div>
+    </div>
+    
+    <div class="note">
+      Document généré automatiquement par le système PlanetKurs<br>
+      Référence : ${result.reference} | ${new Date().toLocaleString('fr-FR')}
+    </div>
+  </div>
+  
+  <div style="text-align: center; margin-top: 30px;">
+    <button onclick="window.print()" style="
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #DD0000, #000000);
+      color: #FFD700;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    ">🖨️ IMPRIMER</button>
+    
+    <button onclick="window.close()" style="
+      padding: 15px 40px;
+      background: #666;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+    ">✕ FERMER</button>
+  </div>
+</body>
+</html>
+      `;
+      
+      printWindow.document.write(html);
+      printWindow.document.close();
+    }
+    
+    function nombreEnLettres(nombre) {
+      // Fonction simplifiée pour convertir un nombre en lettres
+      var unites = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+      var dizaines = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante-dix', 'quatre-vingt', 'quatre-vingt-dix'];
+      var teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+      
+      if (nombre === 0) return 'zéro';
+      if (nombre >= 1000000) return nombre.toLocaleString('fr-FR');
+      
+      var resultat = '';
+      
+      // Milliers
+      if (nombre >= 1000) {
+        var milliers = Math.floor(nombre / 1000);
+        if (milliers === 1) {
+          resultat += 'mille ';
+        } else {
+          resultat += convertirCentaines(milliers) + ' mille ';
+        }
+        nombre %= 1000;
+      }
+      
+      // Centaines, dizaines, unités
+      resultat += convertirCentaines(nombre);
+      
+      return resultat.trim();
+    }
+    
+    function convertirCentaines(n) {
+      var unites = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+      var dizaines = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+      var teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+      
+      var resultat = '';
+      
+      // Centaines
+      if (n >= 100) {
+        var centaines = Math.floor(n / 100);
+        if (centaines === 1) {
+          resultat += 'cent ';
+        } else {
+          resultat += unites[centaines] + ' cent ';
+        }
+        n %= 100;
+      }
+      
+      // Dizaines et unités
+      if (n >= 20) {
+        var d = Math.floor(n / 10);
+        resultat += dizaines[d];
+        n %= 10;
+        if (n > 0) {
+          if (d === 7 || d === 9) {
+            resultat += '-' + teens[n];
+            n = 0;
+          } else {
+            resultat += (n === 1 && d !== 8 ? ' et ' : '-') + unites[n];
+          }
+        } else if (d === 8) {
+          resultat += 's';
+        }
+      } else if (n >= 10) {
+        resultat += teens[n - 10];
+      } else if (n > 0) {
+        resultat += unites[n];
+      }
+      
+      return resultat.trim();
+    }
+    
+    function formatMontant(montant) {
+      return Number(montant).toLocaleString('fr-FR');
+    }
+  </script>
+</body>
+</html>
