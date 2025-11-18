@@ -841,21 +841,27 @@ function ouvrirListeProfesseurs() {
 function obtenirTousLesEleves() {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
+    Logger.log('Spreadsheet actif: ' + ss.getName());
+
     var feuille = ss.getSheetByName('Élèves');
-    
+
     if (!feuille) {
-      Logger.log('Feuille Élèves non trouvée');
-      return [];
+      Logger.log('ERREUR: Feuille Élèves non trouvée');
+      Logger.log('Feuilles disponibles: ' + ss.getSheets().map(function(s) { return s.getName(); }).join(', '));
+      throw new Error('La feuille "Élèves" n\'existe pas. Veuillez d\'abord exécuter "Initialiser les Feuilles" depuis le menu PlanetKurs.');
     }
-    
+
     var lastRow = feuille.getLastRow();
+    Logger.log('Dernière ligne dans Élèves: ' + lastRow);
+
     if (lastRow <= 1) {
-      Logger.log('Aucune donnée dans la feuille Élèves');
+      Logger.log('Aucune donnée dans la feuille Élèves (seulement l\'en-tête)');
       return [];
     }
-    
+
     var data = feuille.getRange(2, 1, lastRow - 1, 11).getValues();
-    
+    Logger.log('Données récupérées: ' + data.length + ' lignes');
+
     var eleves = [];
     for (var i = 0; i < data.length; i++) {
       if (data[i][0]) { // Si matricule existe
@@ -875,12 +881,13 @@ function obtenirTousLesEleves() {
         });
       }
     }
-    
+
     Logger.log('Nombre d\'élèves trouvés: ' + eleves.length);
     return eleves;
   } catch (e) {
-    Logger.log('Erreur obtenirTousLesEleves: ' + e.message);
-    return [];
+    Logger.log('ERREUR obtenirTousLesEleves: ' + e.message);
+    Logger.log('Stack trace: ' + e.stack);
+    throw e; // Relancer l'erreur pour qu'elle soit visible dans le HTML
   }
 }
 
