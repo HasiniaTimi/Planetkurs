@@ -28,35 +28,35 @@ function onOpen() {
 
 function initialiserFeuilles() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+
   // Créer ou récupérer les feuilles
   var feuilleEleves = ss.getSheetByName('Élèves') || ss.insertSheet('Élèves');
   var feuilleProfesseurs = ss.getSheetByName('Professeurs') || ss.insertSheet('Professeurs');
   var feuilleTresorerie = ss.getSheetByName('Trésorerie') || ss.insertSheet('Trésorerie');
   var feuilleTableauDeBord = ss.getSheetByName('Tableau de Bord') || ss.insertSheet('Tableau de Bord');
-  
+
   // Initialiser la feuille Élèves
   if (feuilleEleves.getLastRow() === 0) {
     feuilleEleves.getRange('A1:K1').setValues([[
-      'N° Matricule', 'Nom', 'Prénom', 'Adresse', 'Téléphone', 
+      'N° Matricule', 'Nom', 'Prénom', 'Adresse', 'Téléphone',
       'Email', 'Niveau', 'Date Inscription', 'Statut', 'Professeur Assigné', 'Notes'
     ]]);
     feuilleEleves.getRange('A1:K1').setBackground('#000000').setFontColor('#FFD700').setFontWeight('bold');
     feuilleEleves.setFrozenRows(1);
     feuilleEleves.autoResizeColumns(1, 11);
   }
-  
+
   // Initialiser la feuille Professeurs
   if (feuilleProfesseurs.getLastRow() === 0) {
     feuilleProfesseurs.getRange('A1:H1').setValues([[
-      'ID Prof', 'Nom', 'Prénom', 'Niveau Enseigné', 'Adresse', 
+      'ID Prof', 'Nom', 'Prénom', 'Niveau Enseigné', 'Adresse',
       'Téléphone', 'Email', 'Date Embauche'
     ]]);
     feuilleProfesseurs.getRange('A1:H1').setBackground('#DD0000').setFontColor('#FFFFFF').setFontWeight('bold');
     feuilleProfesseurs.setFrozenRows(1);
     feuilleProfesseurs.autoResizeColumns(1, 8);
   }
-  
+
   // Initialiser la feuille Trésorerie
   if (feuilleTresorerie.getLastRow() === 0) {
     feuilleTresorerie.getRange('A1:I1').setValues([[
@@ -66,17 +66,17 @@ function initialiserFeuilles() {
     feuilleTresorerie.setFrozenRows(1);
     feuilleTresorerie.autoResizeColumns(1, 9);
   }
-  
+
   // Initialiser le Tableau de Bord
   initialiserTableauDeBord(feuilleTableauDeBord);
-  
+
   SpreadsheetApp.getUi().alert('✅ Initialisation terminée!\n\nToutes les feuilles ont été créées avec succès.');
 }
 
 function initialiserTableauDeBord(feuille) {
   feuille.clear();
   feuille.setTabColor('#FFD700');
-  
+
   // En-tête avec informations de l'école - Couleur adoucie
   feuille.getRange('A1:H1').merge().setValue('🇩🇪 PLANETKURS - École de Langue Allemande')
     .setBackground('#34495E').setFontColor('#F1C40F').setFontSize(20).setFontWeight('bold')
@@ -84,7 +84,7 @@ function initialiserTableauDeBord(feuille) {
   feuille.setRowHeight(1, 40);
 
   // Informations de contact de l'école - Couleur adoucie
-  feuille.getRange('A2:H2').merge().setValue('📍 Antananarivo, Madagascar | ☎️ +261 34 64 356 58 | ✉️ contact@planetkurs.mg')
+  feuille.getRange('A2:H2').merge().setValue('📍 Antanimena Antananarivo, Madagascar | ☎️ +261 34 64 356 58 | ✉️ contact@planetkurs.mg')
     .setBackground('#F9E79F').setFontColor('#2C3E50').setFontSize(11).setFontWeight('bold')
     .setHorizontalAlignment('center');
   feuille.setRowHeight(2, 30);
@@ -99,7 +99,7 @@ function initialiserTableauDeBord(feuille) {
   feuille.getRange('A5:C5').merge().setValue('👥 STATISTIQUES ÉLÈVES')
     .setBackground('#E74C3C').setFontColor('#FFFFFF').setFontWeight('bold')
     .setHorizontalAlignment('center');
-  
+
   feuille.getRange('A6').setValue('Total Élèves:');
   // Utiliser la formule via setFormulaR1C1 pour compatibilité internationale
   feuille.getRange('B6').setFormulaR1C1('=COUNTA(Élèves!C[-1])-1');
@@ -160,24 +160,24 @@ function initialiserTableauDeBord(feuille) {
   feuille.getRange('E16').setValue('Sorties ce mois:');
   feuille.getRange('F16').setFormulaR1C1('=ABS(SUMIF(Trésorerie!C2,"Sortie",Trésorerie!C7))');
   feuille.getRange('F16').setNumberFormat('#,##0" Ar"').setBackground('#F5B7B1');
-  
+
   // Instructions pour les graphiques
   feuille.getRange('A19:H19').merge().setValue('💡 Pour ajouter des graphiques: Sélectionnez les données → Insertion → Graphique')
     .setBackground('#FEF5E7').setFontStyle('italic').setHorizontalAlignment('center');
-  
+
   // Créer un graphique automatique pour la répartition des élèves
   creerGraphiqueEleves(feuille);
-  
+
   feuille.autoResizeColumns(1, 8);
 }
 
 function creerGraphiqueEleves(feuille) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    
+
     // Créer les données pour le graphique
     var dataRange = feuille.getRange('A7:B10');
-    
+
     var chart = feuille.newChart()
       .setChartType(Charts.ChartType.PIE)
       .addRange(dataRange)
@@ -186,10 +186,10 @@ function creerGraphiqueEleves(feuille) {
       .setOption('width', 400)
       .setOption('height', 300)
       .setOption('colors', ['#2C2C2C', '#E17055', '#FFEAA7', '#74B9FF'])
-      .setOption('legend', {position: 'right'})
+      .setOption('legend', { position: 'right' })
       .setOption('pieSliceText', 'value')
       .build();
-    
+
     feuille.insertChart(chart);
   } catch (e) {
     Logger.log('Erreur création graphique: ' + e.message);
@@ -211,7 +211,7 @@ function ouvrirFormulaireModificationEleve(eleve) {
   var template = HtmlService.createTemplateFromFile('FormulaireEleve');
   template.eleve = eleve;
   template.modification = true;
-  
+
   var html = template.evaluate()
     .setWidth(600)
     .setHeight(700);
@@ -223,15 +223,15 @@ function genererMatricule() {
   var feuille = ss.getSheetByName('Élèves');
   var derniereLigne = feuille.getLastRow();
   var anneeActuelle = new Date().getFullYear();
-  
+
   if (derniereLigne <= 1) {
     return 'PK-' + anneeActuelle + '-001';
   }
-  
+
   // Chercher le dernier matricule de l'année actuelle
   var data = feuille.getRange(2, 1, derniereLigne - 1, 1).getValues();
   var dernierNumero = 0;
-  
+
   for (var i = data.length - 1; i >= 0; i--) {
     if (data[i][0]) {
       var parts = data[i][0].toString().split('-');
@@ -241,7 +241,7 @@ function genererMatricule() {
       }
     }
   }
-  
+
   var nouveauNumero = dernierNumero + 1;
   return 'PK-' + anneeActuelle + '-' + String(nouveauNumero).padStart(3, '0');
 }
@@ -253,7 +253,7 @@ function enregistrerEleve(data) {
 
     // Validation des données obligatoires
     if (!data.nom || !data.prenom) {
-      return {success: false, message: 'Le nom et le prénom sont obligatoires!'};
+      return { success: false, message: 'Le nom et le prénom sont obligatoires!' };
     }
 
     var matricule = data.matricule || genererMatricule();
@@ -271,7 +271,7 @@ function enregistrerEleve(data) {
       // Ajouter +261
       telephone = '+261 ' + telephone;
     }
-    
+
     var ligne = [
       matricule,
       data.nom,
@@ -285,23 +285,23 @@ function enregistrerEleve(data) {
       data.professeur || '',
       data.notes || ''
     ];
-    
+
     if (data.modifier && data.ligneModifier) {
       feuille.getRange(data.ligneModifier, 1, 1, 11).setValues([ligne]);
-      return {success: true, message: 'Élève modifié avec succès!', matricule: matricule};
+      return { success: true, message: 'Élève modifié avec succès!', matricule: matricule };
     } else {
       feuille.appendRow(ligne);
-      
+
       // Appliquer le formatage alterné
       var derniereLigne = feuille.getLastRow();
       if (derniereLigne % 2 === 0) {
         feuille.getRange(derniereLigne, 1, 1, 11).setBackground('#FFF8DC');
       }
-      
-      return {success: true, message: 'Élève enregistré avec succès!', matricule: matricule};
+
+      return { success: true, message: 'Élève enregistré avec succès!', matricule: matricule };
     }
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -316,17 +316,17 @@ function rechercherEleve(critere, valeur) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Élèves');
-    
+
     if (!feuille) {
       return [];
     }
-    
+
     var data = feuille.getDataRange().getValues();
-    
+
     if (data.length <= 1) {
       return [];
     }
-    
+
     var resultats = [];
     var colonnes = {
       'matricule': 0,
@@ -334,13 +334,13 @@ function rechercherEleve(critere, valeur) {
       'prenom': 2,
       'niveau': 6
     };
-    
+
     var colonne = colonnes[critere];
-    
+
     if (colonne === undefined) {
       return [];
     }
-    
+
     for (var i = 1; i < data.length; i++) {
       if (data[i][colonne] && data[i][colonne].toString().toLowerCase().indexOf(valeur.toLowerCase()) !== -1) {
         resultats.push({
@@ -359,7 +359,7 @@ function rechercherEleve(critere, valeur) {
         });
       }
     }
-    
+
     return resultats;
   } catch (e) {
     Logger.log('Erreur rechercherEleve: ' + e.message);
@@ -372,9 +372,9 @@ function supprimerEleve(ligne) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Élèves');
     feuille.deleteRow(ligne);
-    return {success: true, message: 'Élève supprimé avec succès!'};
+    return { success: true, message: 'Élève supprimé avec succès!' };
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -383,7 +383,7 @@ function chargerEleve(ligne) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Élèves');
     var data = feuille.getRange(ligne, 1, 1, 11).getValues()[0];
-    
+
     return {
       success: true,
       eleve: {
@@ -400,7 +400,7 @@ function chargerEleve(ligne) {
       }
     };
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -419,7 +419,7 @@ function ouvrirFormulaireModificationProfesseur(professeur) {
   var template = HtmlService.createTemplateFromFile('FormulaireProfesseur');
   template.professeur = professeur;
   template.modification = true;
-  
+
   var html = template.evaluate()
     .setWidth(600)
     .setHeight(550);
@@ -462,7 +462,7 @@ function enregistrerProfesseur(data) {
 
     // Validation des données obligatoires
     if (!data.nom || !data.prenom) {
-      return {success: false, message: 'Le nom et le prénom sont obligatoires!'};
+      return { success: false, message: 'Le nom et le prénom sont obligatoires!' };
     }
 
     var idProf = data.idProf || genererIdProfesseur();
@@ -477,7 +477,7 @@ function enregistrerProfesseur(data) {
       }
       telephone = '+261 ' + telephone;
     }
-    
+
     var ligne = [
       idProf,
       data.nom,
@@ -488,22 +488,22 @@ function enregistrerProfesseur(data) {
       data.email || '',
       dateEmbauche
     ];
-    
+
     if (data.modifier && data.ligneModifier) {
       feuille.getRange(data.ligneModifier, 1, 1, 8).setValues([ligne]);
-      return {success: true, message: 'Professeur modifié avec succès!'};
+      return { success: true, message: 'Professeur modifié avec succès!' };
     } else {
       feuille.appendRow(ligne);
-      
+
       var derniereLigne = feuille.getLastRow();
       if (derniereLigne % 2 === 0) {
         feuille.getRange(derniereLigne, 1, 1, 8).setBackground('#FFE4E1');
       }
-      
-      return {success: true, message: 'Professeur enregistré avec succès!'};
+
+      return { success: true, message: 'Professeur enregistré avec succès!' };
     }
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -518,17 +518,17 @@ function rechercherProfesseur(critere, valeur) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Professeurs');
-    
+
     if (!feuille) {
       return [];
     }
-    
+
     var data = feuille.getDataRange().getValues();
-    
+
     if (data.length <= 1) {
       return [];
     }
-    
+
     var resultats = [];
     var colonnes = {
       'id': 0,
@@ -536,13 +536,13 @@ function rechercherProfesseur(critere, valeur) {
       'prenom': 2,
       'niveau': 3
     };
-    
+
     var colonne = colonnes[critere];
-    
+
     if (colonne === undefined) {
       return [];
     }
-    
+
     for (var i = 1; i < data.length; i++) {
       if (data[i][colonne] && data[i][colonne].toString().toLowerCase().indexOf(valeur.toLowerCase()) !== -1) {
         resultats.push({
@@ -558,7 +558,7 @@ function rechercherProfesseur(critere, valeur) {
         });
       }
     }
-    
+
     return resultats;
   } catch (e) {
     Logger.log('Erreur rechercherProfesseur: ' + e.message);
@@ -571,9 +571,9 @@ function supprimerProfesseur(ligne) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Professeurs');
     feuille.deleteRow(ligne);
-    return {success: true, message: 'Professeur supprimé avec succès!'};
+    return { success: true, message: 'Professeur supprimé avec succès!' };
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -582,7 +582,7 @@ function chargerProfesseur(ligne) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Professeurs');
     var data = feuille.getRange(ligne, 1, 1, 8).getValues()[0];
-    
+
     return {
       success: true,
       professeur: {
@@ -597,7 +597,7 @@ function chargerProfesseur(ligne) {
       }
     };
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -605,14 +605,14 @@ function obtenirListeProfesseurs() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var feuille = ss.getSheetByName('Professeurs');
   var data = feuille.getDataRange().getValues();
-  
+
   var professeurs = [];
   for (var i = 1; i < data.length; i++) {
     if (data[i][0]) {
       professeurs.push(data[i][1] + ' ' + data[i][2] + ' (' + data[i][3] + ')');
     }
   }
-  
+
   return professeurs;
 }
 
@@ -634,13 +634,13 @@ function enregistrerTransaction(data) {
 
     // Validation des données obligatoires
     if (!data.type || !data.categorie || !data.montant || !data.description) {
-      return {success: false, message: 'Tous les champs obligatoires doivent être remplis!'};
+      return { success: false, message: 'Tous les champs obligatoires doivent être remplis!' };
     }
 
     // Validation du montant
     var montantNum = parseFloat(data.montant);
     if (isNaN(montantNum) || montantNum <= 0) {
-      return {success: false, message: 'Le montant doit être un nombre positif!'};
+      return { success: false, message: 'Le montant doit être un nombre positif!' };
     }
 
     var dateTransaction = new Date();
@@ -651,24 +651,24 @@ function enregistrerTransaction(data) {
     if (derniereLigne > 1) {
       soldeActuel = feuille.getRange(derniereLigne, 8).getValue() || 0;
     }
-    
+
     // Générer la référence automatique si non fournie
     var reference = data.reference;
     if (!reference || reference.trim() === '') {
       reference = genererReferenceTransaction(data.type);
     }
-    
+
     // Calculer le nouveau solde
     var montant = parseFloat(data.montant);
     var nouveauSolde = soldeActuel;
-    
+
     if (data.type === 'Entrée') {
       nouveauSolde += montant;
     } else {
       nouveauSolde -= montant;
       montant = -montant; // Montant négatif pour les sorties
     }
-    
+
     // Déterminer le nom à enregistrer (élève ou professeur)
     var nomPersonne = '';
     if (data.nomEleve) {
@@ -676,7 +676,7 @@ function enregistrerTransaction(data) {
     } else if (data.nomProfesseur) {
       nomPersonne = data.nomProfesseur;
     }
-    
+
     var ligne = [
       dateTransaction,
       data.type,
@@ -688,9 +688,9 @@ function enregistrerTransaction(data) {
       nouveauSolde,
       reference
     ];
-    
+
     feuille.appendRow(ligne);
-    
+
     // Formatage
     derniereLigne = feuille.getLastRow();
     if (data.type === 'Entrée') {
@@ -698,14 +698,14 @@ function enregistrerTransaction(data) {
     } else {
       feuille.getRange(derniereLigne, 1, 1, 9).setBackground('#FFEBEE');
     }
-    
+
     // Format monétaire pour les colonnes montant et solde
     feuille.getRange(derniereLigne, 7).setNumberFormat('#,##0" Ar"');
     feuille.getRange(derniereLigne, 8).setNumberFormat('#,##0" Ar"');
-    
+
     return {
-      success: true, 
-      message: 'Transaction enregistrée avec succès!', 
+      success: true,
+      message: 'Transaction enregistrée avec succès!',
       solde: nouveauSolde,
       reference: reference,
       ligne: derniereLigne,
@@ -717,7 +717,7 @@ function enregistrerTransaction(data) {
       description: data.description
     };
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -727,29 +727,29 @@ function genererReferenceTransaction(type) {
   var derniereLigne = feuille.getLastRow();
   var anneeActuelle = new Date().getFullYear();
   var moisActuel = ('0' + (new Date().getMonth() + 1)).slice(-2);
-  
+
   // Compter le nombre de transactions de ce type ce mois-ci
   var data = feuille.getDataRange().getValues();
   var compteur = 0;
-  
+
   for (var i = 1; i < data.length; i++) {
     if (data[i][8]) { // Si référence existe
       var ref = data[i][8].toString();
       var prefixe = type === 'Entrée' ? 'REC-' : 'PAY-';
       var dateRef = new Date(data[i][0]);
-      
-      if (ref.startsWith(prefixe) && 
-          dateRef.getFullYear() === anneeActuelle && 
-          dateRef.getMonth() === new Date().getMonth()) {
+
+      if (ref.startsWith(prefixe) &&
+        dateRef.getFullYear() === anneeActuelle &&
+        dateRef.getMonth() === new Date().getMonth()) {
         compteur++;
       }
     }
   }
-  
+
   compteur++;
   var prefixe = type === 'Entrée' ? 'REC' : 'PAY';
   var numero = String(compteur).padStart(4, '0');
-  
+
   return prefixe + '-' + anneeActuelle + moisActuel + '-' + numero;
 }
 
@@ -758,7 +758,7 @@ function obtenirTransaction(ligne) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Trésorerie');
     var data = feuille.getRange(ligne, 1, 1, 9).getValues()[0];
-    
+
     return {
       success: true,
       transaction: {
@@ -774,7 +774,7 @@ function obtenirTransaction(ligne) {
       }
     };
   } catch (e) {
-    return {success: false, message: 'Erreur: ' + e.message};
+    return { success: false, message: 'Erreur: ' + e.message };
   }
 }
 
@@ -786,11 +786,11 @@ function afficherTableauDeBord() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var feuille = ss.getSheetByName('Tableau de Bord');
   ss.setActiveSheet(feuille);
-  SpreadsheetApp.getUi().alert('📊 Tableau de Bord', 
+  SpreadsheetApp.getUi().alert('📊 Tableau de Bord',
     'Le tableau de bord affiche les statistiques en temps réel de PlanetKurs.\n\n' +
     '✓ Statistiques des élèves par niveau\n' +
     '✓ Nombre de professeurs\n' +
-    '✓ État de la trésorerie', 
+    '✓ État de la trésorerie',
     SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
@@ -806,7 +806,7 @@ function obtenirListeEleves() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var feuille = ss.getSheetByName('Élèves');
   var data = feuille.getDataRange().getValues();
-  
+
   var eleves = [];
   for (var i = 1; i < data.length; i++) {
     if (data[i][0]) {
@@ -816,7 +816,7 @@ function obtenirListeEleves() {
       });
     }
   }
-  
+
   return eleves;
 }
 
@@ -847,7 +847,7 @@ function obtenirTousLesEleves() {
 
     if (!feuille) {
       Logger.log('ERREUR: Feuille Élèves non trouvée');
-      Logger.log('Feuilles disponibles: ' + ss.getSheets().map(function(s) { return s.getName(); }).join(', '));
+      Logger.log('Feuilles disponibles: ' + ss.getSheets().map(function (s) { return s.getName(); }).join(', '));
       throw new Error('La feuille "Élèves" n\'existe pas. Veuillez d\'abord exécuter "Initialiser les Feuilles" depuis le menu PlanetKurs.');
     }
 
@@ -895,20 +895,20 @@ function obtenirTousLesProfesseurs() {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Professeurs');
-    
+
     if (!feuille) {
       Logger.log('Feuille Professeurs non trouvée');
       return [];
     }
-    
+
     var lastRow = feuille.getLastRow();
     if (lastRow <= 1) {
       Logger.log('Aucune donnée dans la feuille Professeurs');
       return [];
     }
-    
+
     var data = feuille.getRange(2, 1, lastRow - 1, 8).getValues();
-    
+
     var professeurs = [];
     for (var i = 0; i < data.length; i++) {
       if (data[i][0]) { // Si ID existe
@@ -925,7 +925,7 @@ function obtenirTousLesProfesseurs() {
         });
       }
     }
-    
+
     Logger.log('Nombre de professeurs trouvés: ' + professeurs.length);
     return professeurs;
   } catch (e) {
@@ -980,8 +980,8 @@ function verifierPaiementsEleves(mois, annee) {
         var categorie = dataTresorerie[j][2];
 
         if (nomEleve && nomEleve.includes(matricule) &&
-            moisPaye === moisStr &&
-            (categorie === 'Écolage' || categorie === 'Inscription' || categorie === 'Réinscription')) {
+          moisPaye === moisStr &&
+          (categorie === 'Écolage' || categorie === 'Inscription' || categorie === 'Réinscription')) {
           paye = true;
           montant = Math.abs(dataTresorerie[j][6]);
           datePaiement = dataTresorerie[j][0];
@@ -1041,7 +1041,7 @@ function verifierPaiementsProfesseurs(mois, annee) {
         var categorie = dataTresorerie[j][2];
 
         if (categorie === 'Salaire Professeur' &&
-            description && (description.includes(id) || description.includes(nomComplet))) {
+          description && (description.includes(id) || description.includes(nomComplet))) {
           var date = new Date(dataTresorerie[j][0]);
           if (date.getMonth() === moisNum && date.getFullYear() === annee) {
             paye = true;
@@ -1071,49 +1071,49 @@ function obtenirToutesTransactions(type, categorie, mois, annee) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var feuille = ss.getSheetByName('Trésorerie');
-    
+
     if (!feuille) {
       return [];
     }
-    
+
     var lastRow = feuille.getLastRow();
     if (lastRow <= 1) {
       return [];
     }
-    
+
     var data = feuille.getRange(2, 1, lastRow - 1, 9).getValues();
-    
+
     var resultats = [];
-    
+
     for (var i = 0; i < data.length; i++) {
       if (data[i][0]) { // Si date existe
         var date = new Date(data[i][0]);
         var transactionType = data[i][1];
         var transactionCategorie = data[i][2];
-        
+
         // Appliquer les filtres
         var inclure = true;
-        
+
         // Filtre type
         if (type && transactionType !== type) {
           inclure = false;
         }
-        
+
         // Filtre catégorie
         if (categorie && transactionCategorie !== categorie) {
           inclure = false;
         }
-        
+
         // Filtre mois
         if (mois !== null && date.getMonth() !== mois) {
           inclure = false;
         }
-        
+
         // Filtre année
         if (annee && date.getFullYear() !== annee) {
           inclure = false;
         }
-        
+
         if (inclure) {
           resultats.push({
             date: data[i][0],
@@ -1129,7 +1129,7 @@ function obtenirToutesTransactions(type, categorie, mois, annee) {
         }
       }
     }
-    
+
     return resultats;
   } catch (e) {
     Logger.log('Erreur obtenirToutesTransactions: ' + e.message);

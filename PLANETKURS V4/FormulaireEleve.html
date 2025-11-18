@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <base target="_top">
   <style>
@@ -8,22 +9,22 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Arial', sans-serif;
       background: linear-gradient(135deg, #2C3E50 0%, #C0392B 50%, #F39C12 100%);
       padding: 20px;
     }
-    
+
     .container {
       background: white;
       border-radius: 10px;
       padding: 25px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       max-width: 550px;
       margin: 0 auto;
     }
-    
+
     .header {
       background: linear-gradient(to right, #34495E, #E74C3C, #F1C40F);
       color: white;
@@ -32,17 +33,17 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    
+
     .header h2 {
       margin: 0;
       font-size: 24px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
-    
+
     .form-group {
       margin-bottom: 15px;
     }
-    
+
     label {
       display: block;
       margin-bottom: 5px;
@@ -50,7 +51,7 @@
       font-weight: bold;
       font-size: 14px;
     }
-    
+
     input[type="text"],
     input[type="email"],
     input[type="tel"],
@@ -71,22 +72,22 @@
       border-color: #F1C40F;
       box-shadow: 0 0 5px rgba(241, 196, 15, 0.5);
     }
-    
+
     textarea {
       resize: vertical;
       min-height: 60px;
     }
-    
+
     .required {
       color: #E74C3C;
     }
-    
+
     .btn-group {
       display: flex;
       gap: 10px;
       margin-top: 20px;
     }
-    
+
     button {
       flex: 1;
       padding: 12px;
@@ -97,7 +98,7 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #E74C3C, #34495E);
       color: #F1C40F;
@@ -106,7 +107,7 @@
     .btn-primary:hover {
       background: linear-gradient(135deg, #34495E, #E74C3C);
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .btn-secondary {
@@ -119,7 +120,7 @@
       background: #F39C12;
       transform: translateY(-2px);
     }
-    
+
     .matricule-display {
       background: linear-gradient(135deg, #34495E, #E74C3C);
       color: #F1C40F;
@@ -130,7 +131,7 @@
       font-size: 18px;
       margin-bottom: 15px;
     }
-    
+
     .message {
       padding: 12px;
       border-radius: 5px;
@@ -139,71 +140,70 @@
       font-weight: bold;
       display: none;
     }
-    
+
     .message.success {
       background: #4CAF50;
       color: white;
     }
-    
+
     .message.error {
       background: #E74C3C;
       color: white;
     }
-    
+
     .row {
       display: flex;
       gap: 15px;
     }
-    
+
     .row .form-group {
       flex: 1;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
       <h2>🇩🇪 INSCRIPTION ÉLÈVE - PLANETKURS</h2>
     </div>
-    
+
     <div id="message" class="message"></div>
-    
+
     <div id="matriculeDisplay" class="matricule-display" style="display:none;">
       N° Matricule: <span id="matriculeValue"></span>
     </div>
-    
+
     <form id="eleveForm">
       <div class="row">
         <div class="form-group">
           <label for="nom">Nom <span class="required">*</span></label>
-          <input type="text" id="nom" name="nom" required>
+          <input type="text" id="nom" name="nom" required placeholder="Wagner">
         </div>
-        
+
         <div class="form-group">
           <label for="prenom">Prénom <span class="required">*</span></label>
-          <input type="text" id="prenom" name="prenom" required>
+          <input type="text" id="prenom" name="prenom" required placeholder="Frank">
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="adresse">Adresse <span class="required">*</span></label>
-        <input type="text" id="adresse" name="adresse" required>
+        <input type="text" id="adresse" name="adresse" required placeholder="Lot II...">
       </div>
-      
+
       <div class="row">
         <div class="form-group">
           <label for="telephone">Téléphone <span class="required">*</span></label>
-          <input type="tel" id="telephone" name="telephone" required 
-                 placeholder="034 XX XXX XX">
+          <input type="tel" id="telephone" name="telephone" required placeholder="+261 XX XX XXX XX">
         </div>
-        
+
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" 
-                 placeholder="exemple@email.com">
+          <input type="email" id="email" name="email" placeholder="exemple@email.com">
         </div>
       </div>
-      
+
       <div class="row">
         <div class="form-group">
           <label for="niveau">Niveau <span class="required">*</span></label>
@@ -215,7 +215,7 @@
             <option value="B2">B2 - Intermédiaire Avancé</option>
           </select>
         </div>
-        
+
         <div class="form-group">
           <label for="professeur">Professeur Assigné</label>
           <select id="professeur" name="professeur">
@@ -223,12 +223,12 @@
           </select>
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="notes">Notes / Remarques</label>
         <textarea id="notes" name="notes" placeholder="Informations supplémentaires..."></textarea>
       </div>
-      
+
       <div class="btn-group">
         <button type="submit" class="btn-primary">✓ ENREGISTRER</button>
         <button type="button" class="btn-secondary" onclick="google.script.host.close()">
@@ -237,14 +237,14 @@
       </div>
     </form>
   </div>
-  
+
   <script>
     // Charger la liste des professeurs
-    window.onload = function() {
+    window.onload = function () {
       google.script.run
-        .withSuccessHandler(function(profs) {
+        .withSuccessHandler(function (profs) {
           var select = document.getElementById('professeur');
-          profs.forEach(function(prof) {
+          profs.forEach(function (prof) {
             var option = document.createElement('option');
             option.value = prof;
             option.textContent = prof;
@@ -252,20 +252,20 @@
           });
         })
         .obtenirListeProfesseurs();
-        
+
       // Générer et afficher le matricule
       google.script.run
-        .withSuccessHandler(function(matricule) {
+        .withSuccessHandler(function (matricule) {
           document.getElementById('matriculeValue').textContent = matricule;
           document.getElementById('matriculeDisplay').style.display = 'block';
         })
         .genererMatricule();
     };
-    
+
     // Gestion de la soumission du formulaire
-    document.getElementById('eleveForm').addEventListener('submit', function(e) {
+    document.getElementById('eleveForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      
+
       var data = {
         nom: document.getElementById('nom').value,
         prenom: document.getElementById('prenom').value,
@@ -276,45 +276,45 @@
         professeur: document.getElementById('professeur').value,
         notes: document.getElementById('notes').value
       };
-      
+
       // Désactiver le bouton pendant l'envoi
       var btn = document.querySelector('.btn-primary');
       btn.disabled = true;
       btn.textContent = '⏳ ENREGISTREMENT...';
-      
+
       google.script.run
-        .withSuccessHandler(function(result) {
+        .withSuccessHandler(function (result) {
           var messageDiv = document.getElementById('message');
           messageDiv.className = 'message ' + (result.success ? 'success' : 'error');
           messageDiv.textContent = result.message;
           messageDiv.style.display = 'block';
-          
+
           if (result.success) {
             // Réinitialiser le formulaire
             document.getElementById('eleveForm').reset();
-            
+
             // Générer un nouveau matricule
             google.script.run
-              .withSuccessHandler(function(matricule) {
+              .withSuccessHandler(function (matricule) {
                 document.getElementById('matriculeValue').textContent = matricule;
               })
               .genererMatricule();
-            
+
             // Fermer après 2 secondes
-            setTimeout(function() {
+            setTimeout(function () {
               google.script.host.close();
             }, 2000);
           }
-          
+
           btn.disabled = false;
           btn.textContent = '✓ ENREGISTRER';
         })
-        .withFailureHandler(function(error) {
+        .withFailureHandler(function (error) {
           var messageDiv = document.getElementById('message');
           messageDiv.className = 'message error';
           messageDiv.textContent = 'Erreur: ' + error.message;
           messageDiv.style.display = 'block';
-          
+
           btn.disabled = false;
           btn.textContent = '✓ ENREGISTRER';
         })
@@ -322,4 +322,5 @@
     });
   </script>
 </body>
+
 </html>

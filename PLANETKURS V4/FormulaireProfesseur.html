@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <base target="_top">
   <style>
@@ -8,22 +9,22 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Arial', sans-serif;
       background: linear-gradient(to bottom, #000000 0%, #DD0000 50%, #FFD700 100%);
       padding: 20px;
     }
-    
+
     .container {
       background: white;
       border-radius: 10px;
       padding: 25px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       max-width: 550px;
       margin: 0 auto;
     }
-    
+
     .header {
       background: linear-gradient(to right, #000000, #DD0000, #FFD700);
       color: white;
@@ -32,17 +33,17 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    
+
     .header h2 {
       margin: 0;
       font-size: 24px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
-    
+
     .form-group {
       margin-bottom: 15px;
     }
-    
+
     label {
       display: block;
       margin-bottom: 5px;
@@ -50,7 +51,7 @@
       font-weight: bold;
       font-size: 14px;
     }
-    
+
     input[type="text"],
     input[type="email"],
     input[type="tel"],
@@ -62,24 +63,24 @@
       font-size: 14px;
       transition: all 0.3s;
     }
-    
+
     input:focus,
     select:focus {
       outline: none;
       border-color: #FFD700;
       box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
     }
-    
+
     .required {
       color: #DD0000;
     }
-    
+
     .btn-group {
       display: flex;
       gap: 10px;
       margin-top: 20px;
     }
-    
+
     button {
       flex: 1;
       padding: 12px;
@@ -90,29 +91,29 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #DD0000, #000000);
       color: #FFD700;
     }
-    
+
     .btn-primary:hover {
       background: linear-gradient(135deg, #000000, #DD0000);
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
-    
+
     .btn-secondary {
       background: #FFD700;
       color: #000000;
       border: 2px solid #000000;
     }
-    
+
     .btn-secondary:hover {
       background: #FFC700;
       transform: translateY(-2px);
     }
-    
+
     .id-display {
       background: linear-gradient(135deg, #000000, #DD0000);
       color: #FFD700;
@@ -123,7 +124,7 @@
       font-size: 18px;
       margin-bottom: 15px;
     }
-    
+
     .message {
       padding: 12px;
       border-radius: 5px;
@@ -132,26 +133,26 @@
       font-weight: bold;
       display: none;
     }
-    
+
     .message.success {
       background: #4CAF50;
       color: white;
     }
-    
+
     .message.error {
       background: #DD0000;
       color: white;
     }
-    
+
     .row {
       display: flex;
       gap: 15px;
     }
-    
+
     .row .form-group {
       flex: 1;
     }
-    
+
     .niveau-info {
       background: #FFF8DC;
       border-left: 4px solid #FFD700;
@@ -162,31 +163,32 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
       <h2>👨‍🏫 AJOUTER PROFESSEUR - PLANETKURS</h2>
     </div>
-    
+
     <div id="message" class="message"></div>
-    
+
     <div id="idDisplay" class="id-display" style="display:none;">
       ID Professeur: <span id="idValue"></span>
     </div>
-    
+
     <form id="profForm">
       <div class="row">
         <div class="form-group">
           <label for="nom">Nom <span class="required">*</span></label>
-          <input type="text" id="nom" name="nom" required>
+          <input type="text" id="nom" name="nom" required placeholder="Muller">
         </div>
-        
+
         <div class="form-group">
           <label for="prenom">Prénom <span class="required">*</span></label>
-          <input type="text" id="prenom" name="prenom" required>
+          <input type="text" id="prenom" name="prenom" required placeholder="Julia">
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="niveau">Niveau Enseigné <span class="required">*</span></label>
         <select id="niveau" name="niveau" required>
@@ -199,31 +201,29 @@
           <option value="B1,B2">B1 & B2</option>
           <option value="Tous">Tous niveaux</option>
         </select>
-        
+
         <div class="niveau-info">
           💡 <strong>Astuce:</strong> Un professeur peut enseigner plusieurs niveaux
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="adresse">Adresse <span class="required">*</span></label>
-        <input type="text" id="adresse" name="adresse" required>
+        <input type="text" id="adresse" name="adresse" required placeholder="Lot II ...">
       </div>
-      
+
       <div class="row">
         <div class="form-group">
           <label for="telephone">Téléphone <span class="required">*</span></label>
-          <input type="tel" id="telephone" name="telephone" required 
-                 placeholder="034 XX XXX XX">
+          <input type="tel" id="telephone" name="telephone" required placeholder="+261 XX XX XXX XX">
         </div>
-        
+
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" 
-                 placeholder="prof@example.com">
+          <input type="email" id="email" name="email" placeholder="prof@example.com">
         </div>
       </div>
-      
+
       <div class="btn-group">
         <button type="submit" class="btn-primary">✓ ENREGISTRER</button>
         <button type="button" class="btn-secondary" onclick="google.script.host.close()">
@@ -232,22 +232,22 @@
       </div>
     </form>
   </div>
-  
+
   <script>
     // Charger et afficher l'ID professeur
-    window.onload = function() {
+    window.onload = function () {
       google.script.run
-        .withSuccessHandler(function(idProf) {
+        .withSuccessHandler(function (idProf) {
           document.getElementById('idValue').textContent = idProf;
           document.getElementById('idDisplay').style.display = 'block';
         })
         .genererIdProfesseur();
     };
-    
+
     // Gestion de la soumission du formulaire
-    document.getElementById('profForm').addEventListener('submit', function(e) {
+    document.getElementById('profForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      
+
       var data = {
         nom: document.getElementById('nom').value,
         prenom: document.getElementById('prenom').value,
@@ -256,45 +256,45 @@
         telephone: document.getElementById('telephone').value,
         email: document.getElementById('email').value
       };
-      
+
       // Désactiver le bouton pendant l'envoi
       var btn = document.querySelector('.btn-primary');
       btn.disabled = true;
       btn.textContent = '⏳ ENREGISTREMENT...';
-      
+
       google.script.run
-        .withSuccessHandler(function(result) {
+        .withSuccessHandler(function (result) {
           var messageDiv = document.getElementById('message');
           messageDiv.className = 'message ' + (result.success ? 'success' : 'error');
           messageDiv.textContent = result.message;
           messageDiv.style.display = 'block';
-          
+
           if (result.success) {
             // Réinitialiser le formulaire
             document.getElementById('profForm').reset();
-            
+
             // Générer un nouvel ID
             google.script.run
-              .withSuccessHandler(function(idProf) {
+              .withSuccessHandler(function (idProf) {
                 document.getElementById('idValue').textContent = idProf;
               })
               .genererIdProfesseur();
-            
+
             // Fermer après 2 secondes
-            setTimeout(function() {
+            setTimeout(function () {
               google.script.host.close();
             }, 2000);
           }
-          
+
           btn.disabled = false;
           btn.textContent = '✓ ENREGISTRER';
         })
-        .withFailureHandler(function(error) {
+        .withFailureHandler(function (error) {
           var messageDiv = document.getElementById('message');
           messageDiv.className = 'message error';
           messageDiv.textContent = 'Erreur: ' + error.message;
           messageDiv.style.display = 'block';
-          
+
           btn.disabled = false;
           btn.textContent = '✓ ENREGISTRER';
         })
@@ -302,4 +302,5 @@
     });
   </script>
 </body>
+
 </html>
